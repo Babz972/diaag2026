@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14213D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diag 2026">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}</style>
+<title>Diagonale des Fous 2026</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column race companion — header stats, sticky tabs, tool panels. Ink navy + Grand Raid yellow. */
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --surface2:#F5F7FA; --ink:#14213D; --muted:#5A6678; --line:#D4DBE4;
+  --accent:#F2C200; --accent-ink:#7A5E00; --on-accent:#14213D; --terrain:#2F4A6E;
+  --water:#1F74B0; --water-bg:#E1EEF8;
+  --ok:#1C8A57; --warn:#B87D00; --bad:#C3302A; --ok-bg:#E2F3EA; --warn-bg:#FBF0D6; --bad-bg:#FBE3E1;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1520; --surface:#162030; --surface2:#1B2739; --ink:#E7ECF3; --muted:#94A1B5; --line:#2A3749;
+  --accent:#F5CB2A; --accent-ink:#F5CB2A; --on-accent:#14213D; --terrain:#86A8D6;
+  --water:#62AEE6; --water-bg:#15293D;
+  --ok:#43C189; --warn:#E8B23C; --bad:#F06B60; --ok-bg:#15352A; --warn-bg:#3A3015; --bad-bg:#3D1C1C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1520; --surface:#162030; --surface2:#1B2739; --ink:#E7ECF3; --muted:#94A1B5; --line:#2A3749;
+  --accent:#F5CB2A; --accent-ink:#F5CB2A; --on-accent:#14213D; --terrain:#86A8D6;
+  --water:#62AEE6; --water-bg:#15293D;
+  --ok:#43C189; --warn:#E8B23C; --bad:#F06B60; --ok-bg:#15352A; --warn-bg:#3A3015; --bad-bg:#3D1C1C; color-scheme:dark}
+.tin{display:inline-flex;gap:4px;align-items:center}
+.tin select,.tin input{font:500 13px var(--mono);color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:4px 5px}
+.tin input{width:92px}
+.tin.set select,.tin.set input{border-color:var(--ink);background:var(--surface)}
+.xbtn,.nowbtn{font:600 12px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:6px;padding:4px 7px;cursor:pointer}
+.nowbtn{color:var(--water)}
+.est{color:var(--muted);font-size:12px;display:block}
+.seg{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:600 14px var(--body);border:0;background:var(--surface);color:var(--ink);padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.wseg{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.wseg:last-child{border-bottom:0}
+.wkm{font-family:var(--display);font-weight:800;font-size:26px;line-height:1;color:var(--water);min-width:64px}
+.wkm small{font-size:13px;font-weight:600}
+.wseg .n{min-width:0;font-size:14px}
+.wseg .n .hint{display:block}
+.wseg.long .wkm{color:var(--bad)}
+.leg{display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+.leg:last-child{border-bottom:0}
+.leg-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;cursor:pointer}
+.leg-h h3{font-size:22px;font-weight:800;text-transform:uppercase}
+.leg-h .hint{font-size:13px}
+.leg .kv b small{color:var(--muted);font-size:11px;font-family:var(--body)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13px}
+.chain .st{font-weight:600}
+.chain .ar{font-family:var(--mono);color:var(--water);white-space:nowrap}
+.chain .ar.long{color:var(--bad)}
+.leg-l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.leg.total{background:var(--surface2);border-radius:10px;padding:12px;border:0;margin-top:6px}
+.wbadge{font-size:12px;border-radius:4px;padding:1px 6px;background:var(--water-bg);color:var(--water);font-weight:600}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;padding:0 16px 48px}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:.01em}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{padding-block:20px 12px;display:grid;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(40px,10vw,64px);line-height:.9;font-weight:800;text-transform:uppercase}
+h1 span{background:var(--accent);color:var(--on-accent);padding:0 .12em}
+.route{color:var(--muted);font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--surface);padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-size:26px;line-height:1;font-weight:700}
+.stat small{color:var(--muted);font-size:12px}
+@media (max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tab{font:600 15px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 6px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.panel{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding-top:6px}
+section.panel>*{min-width:0}
+.lrow{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:8px}
+.lrow.cur{background:var(--surface2);margin:0 -14px;padding:10px 14px}
+.lrow .hd{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lrow .io{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted)}
+.lrow .io>div{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.lrow .st{display:flex;gap:6px 12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.lrow .st b{color:var(--ink);font-family:var(--mono);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:22px;font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.hint{color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px var(--body);border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:999px;padding:6px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.chart{width:100%;position:relative;touch-action:pan-y}
+.chart svg{display:block;width:100%}
+.ax{fill:var(--muted);font:11px var(--mono)}
+.gl{stroke:var(--line);stroke-width:1}
+.lbl{fill:var(--ink);font:600 11px var(--body)}
+.info{display:grid;gap:8px}
+.info-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.code{font-family:var(--display);font-weight:800;font-size:15px;background:var(--ink);color:var(--bg);border-radius:5px;padding:1px 7px;margin-right:6px}
+.code.bv{background:var(--accent);color:var(--on-accent)}
+.code.pr{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.kv div{background:var(--surface2);border-radius:8px;padding:7px 9px}
+.kv small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.kv b{font-family:var(--mono);font-weight:500;font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:12px;border-radius:4px;padding:1px 6px;background:var(--surface2);border:1px solid var(--line);color:var(--ink)}
+.tag.s{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:600}
+.pill{font:500 12px var(--mono);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)} .p-na{background:var(--surface2);color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+ol.rank{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+ol.rank li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:baseline;font-size:14px;cursor:pointer;padding:4px 0;border-bottom:1px solid var(--line)}
+ol.rank li:last-child{border-bottom:0}
+ol.rank .n{min-width:0}
+.ctrl{display:grid;gap:4px}
+.ctrl label{font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.ctrl label output{font-family:var(--mono);font-weight:500;color:var(--accent-ink)}
+input[type=range]{width:100%;accent-color:var(--ink)}
+.big{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big b{font-family:var(--display);font-size:52px;line-height:1;font-weight:800}
+.big span{color:var(--muted)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:520px){.grid3{grid-template-columns:1fr 1fr 1fr}}
+.field{display:grid;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.field input,.field select,.search{font:500 15px var(--body);color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sum div{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.sum small{display:block;color:var(--muted);font-size:12px}
+.sum b{font-family:var(--mono);font-weight:500;font-size:16px}
+.sum .ok{border-color:var(--ok)} .sum .warn{border-color:var(--warn)} .sum .bad{border-color:var(--bad)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+td.r,th.r{text-align:right}
+tr.pr td{color:var(--muted)}
+tr.click{cursor:pointer}
+.btn{font:600 14px var(--body);background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:5px;border-radius:2px}
+details.pt{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+details.pt summary{list-style:none;cursor:pointer;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+details.pt summary::-webkit-details-marker{display:none}
+details.pt .nm{min-width:0;font-weight:600}
+details.pt .sub{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+details.pt .body{padding:0 12px 12px;display:grid;gap:10px}
+details.pt.is-pr{background:var(--surface2)}
+.list{display:grid;gap:8px}
+.verdict{border-radius:10px;padding:12px 14px;font-weight:600}
+.warnbox{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:13px}
+.foot{color:var(--muted);font-size:12px;padding-top:18px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Grand Raid Réunion · Roadbook & barrières horaires</div>
+  <h1>Diagonale <span>des Fous</span> 2026</h1>
+  <div class="route">Saint-Pierre Ravine Blanche → Saint-Denis La Redoute · départ jeudi 22h00</div>
+  <div class="stats">
+    <div class="stat"><b class="num">180,8</b><small>km</small></div>
+    <div class="stat"><b class="num">10 191</b><small>m D+</small></div>
+    <div class="stat"><b class="num">10 154</b><small>m D−</small></div>
+    <div class="stat"><b class="num">66 h</b><small>barrière finale · dim. 16h00</small></div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab" role="tab" id="t-profil" data-tab="profil" aria-selected="true">Profil</button>
+  <button class="tab" role="tab" id="t-plan" data-tab="plan" aria-selected="false">Plan</button>
+  <button class="tab" role="tab" id="t-live" data-tab="live" aria-selected="false">Live</button>
+  <button class="tab" role="tab" id="t-points" data-tab="points" aria-selected="false">Points</button>
+</nav>
+
+<!-- PROFIL -->
+<section class="panel" id="p-profil">
+  <div class="card">
+    <h2>Profil altimétrique</h2>
+    <div class="chips" id="ranges"></div>
+    <div class="chart" id="profile" style="margin-top:10px"></div>
+    <p class="hint">Touche ou glisse sur le profil pour lire chaque point. Tracé reconstitué entre les points du roadbook.</p>
+  </div>
+  <div class="card info" id="pinfo"></div>
+  <div class="card">
+    <h2>Tronçons entre ravitos</h2>
+    <p class="hint" style="margin-top:0">Pour chaque tronçon : la distance et le dénivelé (avec le cumul depuis le départ), les km entre chaque point eau ou repas, et les km depuis la dernière assistance personnelle.</p>
+    <div class="legend" style="margin-bottom:6px"><span><span class="wbadge">eau / repas</span></span><span><span class="tag s">assistance</span></span><span><span class="tag" style="color:var(--bad)">pas d'eau</span></span></div>
+    <div id="legs"></div>
+  </div>
+  <div class="card">
+    <h2>Autonomie en eau</h2>
+    <p class="hint" style="margin-top:0">Distance entre deux postes avec eau (ravito ou point d'eau). C'est ce que le coureur doit couvrir avec ce qu'il porte. Le temps est celui de ton plan.</p>
+    <div id="water"></div>
+  </div>
+  <div class="card" style="display:grid;gap:10px">
+    <h2 style="margin:0">Tronçons entre ravitos</h2>
+    <p class="hint" style="margin:0">Choisis les postes qui coupent le parcours. Pour chaque tronçon : distance, D+, D− et les cumuls depuis le départ.</p>
+    <div class="chips" id="segf">
+      <button class="chip" data-s="w">Eau et/ou repas</button>
+      <button class="chip" data-s="a">Assistance personnelle</button>
+    </div>
+    <div class="tbl"><table id="segt"></table></div>
+    <div class="sum" id="segsum"></div>
+  </div>
+  <div class="two">
+    <div class="card"><h2>Les murs</h2><p class="hint">Sections les plus raides en montée (m D+ par km).</p><ol class="rank" id="climbs"></ol></div>
+    <div class="card"><h2>Les descentes</h2><p class="hint">Sections les plus cassantes (m D− par km).</p><ol class="rank" id="descents"></ol></div>
+  </div>
+</section>
+
+<!-- PLAN -->
+<section class="panel" id="p-plan" hidden>
+  <div class="card" style="display:grid;gap:14px">
+    <h2>Mon plan de course</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="seg" id="mode"><button data-m="model">Calcul auto</button><button data-m="manual">Mes horaires</button></div>
+      <span class="hint" id="mode-hint"></span>
+    </div>
+    <div class="ctrl" id="target-ctrl">
+      <label for="target">Temps visé <output id="o-target"></output></label>
+      <input type="range" id="target" min="24" max="66" step="0.25">
+    </div>
+    <div class="ctrl">
+      <label for="fatigue">Baisse de régime en fin de course <output id="o-fatigue"></output></label>
+      <input type="range" id="fatigue" min="0" max="0.9" step="0.05">
+    </div>
+    <div class="grid3">
+      <label class="field">Arrêt base vie (min)<input type="number" id="s-bv" min="0" max="240" step="5"></label>
+      <label class="field">Arrêt ravito (min)<input type="number" id="s-rv" min="0" max="60" step="1"></label>
+      <label class="field">Arrêt point d'eau (min)<input type="number" id="s-eau" min="0" max="30" step="1"></label>
+    </div>
+    <div class="sum" id="psum"></div>
+    <div id="pwarn"></div>
+  </div>
+  <div class="card">
+    <h2>Couloir horaire</h2>
+    <div class="legend"><span><i style="background:var(--bad)"></i>Fermeture des postes</span><span><i style="background:var(--muted)"></i>Ouverture</span><span><i style="background:var(--accent)"></i>Ton plan</span><span><i style="background:var(--ink)"></i>Réel (onglet Live)</span></div>
+    <div class="chart" id="corridor" style="margin-top:8px"></div>
+    <p class="hint">Plus ta ligne est loin sous la ligne rouge, plus tu as de marge.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <h2 style="margin:0">Horaires de passage</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="chip" id="pr-toggle" aria-pressed="false">Afficher les PR</button>
+        <button class="btn ghost" id="man-fill" hidden>Remplir avec le calcul</button>
+        <button class="btn ghost" id="man-clear" hidden>Effacer mes horaires</button>
+        <button class="btn" id="copy-assist">Copier pour l'assistance</button>
+      </div>
+    </div>
+    <div class="tbl"><table id="ptable"></table></div>
+    <p class="hint" id="copy-msg"></p>
+    <textarea id="copy-fallback" hidden readonly style="width:100%;height:160px;font:12px var(--mono);background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px"></textarea>
+  </div>
+</section>
+
+<!-- LIVE -->
+<section class="panel" id="p-live" hidden>
+  <div class="card" style="display:grid;gap:12px">
+    <h2>Suivi en course</h2>
+    <p class="hint" style="margin:0">Note l'heure d'arrivée et de départ du coureur à chaque poste. « Maintenant » remplit l'heure du téléphone. L'app compare au plan, mesure le temps d'arrêt et projette la suite.</p>
+  </div>
+  <div class="card" id="lres" style="display:grid;gap:12px"></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <h2 style="margin:0">Pointages</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="chip" id="l-pr" aria-pressed="false">Afficher les PR</button><button class="btn ghost" id="l-clear">Effacer les pointages</button></div>
+    </div>
+    <div id="l-confirm"></div>
+    <div id="ltable"></div>
+  </div>
+</section>
+
+<!-- POINTS -->
+<section class="panel" id="p-points" hidden>
+  <div class="card" style="display:grid;gap:10px">
+    <input class="search" id="q" type="search" placeholder="Chercher un lieu : Cilaos, Maïdo, Hell-Bourg…">
+    <div class="chips" id="filters"></div>
+  </div>
+  <div class="list" id="plist"></div>
+</section>
+
+<p class="foot">Données : roadbook officiel Diagonale des Fous 2026 avec barrières horaires. Les horaires estimés sont un modèle (distance, D+, D−, baisse de régime et arrêts) : vérifie toujours les consignes de l'organisation.</p>
+</div>
+
+<script>
+// code, nom, ouverture, fermeture, partiel km, cumul km, alt, D+, cumul D+, D-, cumul D-, pointage (B barrière / N indicatif), services
+// A assistance, S sac, R ravito, E eau, O soupe, H repas chaud, M médecin, I infirmier, K kiné, G podologue, X secouriste, T ostéo
+const RAW=[
+['DEP','Saint-Pierre Ravine Blanche','J18:00','J22:00',0,0,2,0,0,0,0,'B','ARMIX'],
+['CP1','Domaine Vidot','J22:00','V01:30',14,14,649,672,672,32,32,'B','ARI'],
+['CP2','Notre-Dame de la Paix – École','V00:30','V07:00',19.4,33.4,1686,1476,2148,436,468,'B','AROI'],
+['CP3','Parking aire Nez de Bœuf','V01:45','V10:30',12,45.4,2023,650,2798,314,782,'B','AROI'],
+['CP4','Mare à Boue','V02:00','V13:00',10.2,55.6,1604,96,2894,513,1295,'B','AROHMI'],
+['CP5','Coteau Kerveguen','','',9.5,65.1,2187,708,3602,127,1422,'','E'],
+['CP6','Croisée Coteau Kerveguen','V04:30','V17:30',2.5,67.6,2475,288,3890,0,1422,'N','I'],
+['PR1','Intersection Cap Anglais','','',2.9,70.5,2154,10,3900,332,1754,'',''],
+['CP7','Gîte de Bélouve','V05:00','V21:00',5.9,76.4,1502,66,3966,716,2470,'N','E'],
+['BV1','Hell-Bourg','V05:30','S01:00',4.2,80.6,995,77,4043,586,3056,'B','SAROHMIKG'],
+['PR2','Parking Bras Marrons','','',3.7,84.3,745,49,4092,299,3355,'',''],
+['PR3','Îlet Mare d\'Affouches','','',1.6,85.9,896,202,4294,51,3406,'',''],
+['PR4','Grand Sable / Camp Pierrot','','',1.3,87.2,1051,136,4430,4,3410,'',''],
+['PR5','Col de Fourche / Plaine des Merles','','',5.9,93.1,1775,859,5289,114,3524,'',''],
+['CP8','Plaine des Merles','V07:30','S06:00',0.7,93.8,1808,31,5320,6,3530,'B','ROMI'],
+['CP9','Départ Sentier Scout','V07:30','S07:00',2.2,96,1635,44,5364,206,3736,'B','A'],
+['PR6','La Plaque','','',6.4,102.4,896,249,5613,978,4714,'',''],
+['PR7','Îlet à Bourse','','',2,104.4,889,98,5711,108,4822,'',''],
+['CP10','Grand Place les Bas – École','V09:00','S11:30',3.4,107.8,665,145,5856,371,5193,'B','AROMI'],
+['PR8','Roche Ancrée','','',3.5,111.3,544,324,6180,429,5622,'',''],
+['CP11','Roche Plate – Plateau Cerf','V10:00','S16:30',5.1,116.4,1256,733,6913,41,5663,'B','ARMI'],
+['PR9','La Brèche','','',2.5,118.9,1294,196,7109,202,5865,'',''],
+['PR10','Ti Col Maïdo','','',3.5,122.4,2029,824,7933,70,5935,'','A'],
+['CP12','Maïdo – Tête Dure','V12:00','S20:30',1.5,123.9,1950,36,7969,129,6064,'B','ROMI'],
+['BV2','Îlet Savannah','V14:00','D00:15',16.6,140.5,133,126,8095,1904,7968,'B','SAROHMIKG'],
+['CP13','Chemin Ratinaud – Kalla','V15:00','D03:00',7.4,147.9,440,631,8726,329,8297,'B','R'],
+['PR11','Lot. La Résidence Grande Montagne','','',6,153.9,52,197,8923,585,8882,'',''],
+['CP14','La Possession – Place Festival','V16:00','D06:30',1.2,155.1,20,6,8929,30,8912,'B','AROMI'],
+['CP15','Grande Chaloupe','V17:00','D09:00',9.4,164.5,10,373,9302,389,9301,'B','ARO'],
+['PR12','Saint-Bernard – Les Bambous','','',4.5,169,456,465,9767,19,9320,'',''],
+['CP16','Colorado','V18:00','D13:30',4.8,173.8,682,365,10132,134,9454,'B','AROI'],
+['PR13','Belvédère de La Vigie','','',4,177.8,347,23,10155,363,9817,'',''],
+['ARR','La Redoute','V19:00','D16:00',3,180.8,49,36,10191,337,10154,'B','SARHMIKGXT']];
+const SVC={S:'Sac de rechange',A:'Assistance',R:'Ravito',E:'Eau',O:'Soupe',H:'Repas chaud',M:'Médecin',I:'Infirmier',K:'Kiné',G:'Podologue',X:'Secouriste',T:'Ostéopathe'};
+const DAYS=['Jeu','Ven','Sam','Dim','Lun'];
+const parseT=s=>{if(!s)return null;const d={J:0,V:1,S:2,D:3}[s[0]];const[h,m]=s.slice(1).split(':').map(Number);return d*24+h+m/60-22};
+const P=RAW.map((r,i)=>({i,code:r[0],name:r[1],open:parseT(r[2]),close:parseT(r[3]),part:r[4],km:r[5],alt:r[6],dp:r[7],cdp:r[8],dm:r[9],cdm:r[10],ptg:r[11],svc:r[12],
+  kind:r[0].startsWith('PR')?'pr':r[0].startsWith('BV')?'bv':'cp'}));
+const RVN={CP1:'R1',CP2:'R2',CP3:'R3',CP4:'R4',BV1:'R5',CP9:'R6',CP10:'R7',CP11:'R8',PR10:'R9',BV2:'R10',CP14:'R11',CP15:'R12',CP16:'T-shirt finish'};
+P.forEach(p=>{p.off=p.code;if(RVN[p.code]){p.code=RVN[p.code];if(p.kind==='pr')p.kind='cp'}if(p.off==='CP3')p.note='inaccessible'});
+const TOT=180.8;
+const $=s=>document.querySelector(s);
+const fmt=e=>{if(e==null)return'—';const tm=Math.round((e+22)*60);const d=Math.floor(tm/1440);const h=Math.floor(tm%1440/60),m=tm%60;return`${DAYS[d]??'+'} ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`};
+const dur=h=>{const neg=h<0;const tm=Math.round(Math.abs(h)*60);return(neg?'−':'')+`${Math.floor(tm/60)}h${String(tm%60).padStart(2,'0')}`};
+const nf=(x,d=1)=>x.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const mClass=m=>m==null?'p-na':m<0?'p-bad':m<0.5?'p-bad':m<2?'p-warn':'p-ok';
+const mText=m=>m==null?'pas de barrière':m<0?`hors délai ${dur(-m)}`:`marge ${dur(m)}`;
+const codeTag=p=>`<span class="code ${p.kind==='bv'?'bv':p.kind==='pr'?'pr':''}">${p.code}</span>${p.note?`<span class="tag" style="margin-right:6px;color:var(--bad)">${p.note}</span>`:''}`;
+const tagsHtml=p=>p.svc?`<div class="tags">${[...p.svc].map(c=>`<span class="tag ${c==='S'||c==='A'?'s':''}">${SVC[c]}</span>`).join('')}</div>`:'<span class="hint">Point repère, aucun service</span>';
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------- state ----------
+const DEF={target:55,fatigue:0.35,bv:40,rv:8,eau:2,tab:'profil',range:0,sel:9,showPR:false,mode:'model',man:{},log:{},lpr:false,filters:[],segW:true,segA:true};
+let S={...DEF};
+try{const s=JSON.parse(localStorage.getItem('diag26')||'null');if(s)S={...DEF,...s}}catch(e){}
+const save=()=>{try{localStorage.setItem('diag26',JSON.stringify(S))}catch(e){}};
+
+// ---------- pacing model ----------
+function stopOf(p){if(p.code==='DEP'||p.code==='ARR')return 0;if(p.svc.includes('S'))return S.bv/60;if(p.svc.includes('R'))return S.rv/60;if(p.svc.includes('E'))return S.eau/60;return 0}
+function plan(){
+  const w=P.map((p,i)=>i===0?0:(p.part+p.dp/100+p.dm/250)*(1+S.fatigue*((p.km-p.part/2)/TOT)));
+  const W=w.reduce((a,b)=>a+b,0);
+  const stops=P.map(stopOf);const stopTot=stops.reduce((a,b)=>a+b,0);
+  const moving=S.target-stopTot;
+  let t=0,mv=0;const arr=[],mov=[];
+  P.forEach((p,i)=>{if(i>0){const s=w[i]/W*moving;t+=s;mv+=s}arr.push(t);mov.push(mv);t+=stops[i]});
+  const model=arr.slice();
+  if(S.mode==='manual'){
+    const anc=[0,...Object.keys(S.man).map(Number).filter(i=>i>0&&S.man[i]!=null).sort((a,b)=>a-b)];
+    const val=i=>i===0?0:S.man[i];
+    for(let k=0;k<anc.length;k++){const a=anc[k],b=anc[k+1];arr[a]=val(a);
+      if(b!=null){for(let j=a+1;j<b;j++){const f=(model[j]-model[a])/((model[b]-model[a])||1);arr[j]=val(a)+f*(val(b)-val(a))}}
+      else{const r=a>0&&model[a]>0?Math.min(1.6,Math.max(0.6,val(a)/model[a])):1;for(let j=a+1;j<P.length;j++)arr[j]=val(a)+(model[j]-model[a])*r}}
+  }
+  const margin=P.map((p,i)=>p.close==null?null:p.close-arr[i]);
+  return{arr,model,mov,stops,moving,stopTot,margin,w,W,finish:arr[P.length-1]};
+}
+let PL=plan();
+
+// ---------- tabs ----------
+function setTab(t){S.tab=t;document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['profil','plan','live','points'].forEach(k=>$('#p-'+k).hidden=k!==t);save();renderAll()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+// ---------- profil ----------
+const RANGES=[['Tout le parcours',0,TOT],['Départ → Hell-Bourg',0,80.6],['Hell-Bourg → Îlet Savannah',80.6,140.5],['Îlet Savannah → Redoute',140.5,TOT]];
+$('#ranges').innerHTML=RANGES.map((r,i)=>`<button class="chip" data-r="${i}" aria-pressed="${i===S.range}">${r[0]}</button>`).join('');
+$('#ranges').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;S.range=+b.dataset.r;$('#ranges').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));save();renderProfile()};
+
+function renderProfile(){
+  const box=$('#profile');const Wd=Math.max(300,box.clientWidth),H=Wd<500?220:270;
+  const [_,k0,k1]=RANGES[S.range];const pad={l:40,r:10,t:22,b:24};
+  const pts=P.filter(p=>p.km>=k0-0.01&&p.km<=k1+0.01);
+  const amax=2600;const x=k=>pad.l+(k-k0)/(k1-k0)*(Wd-pad.l-pad.r);const y=a=>pad.t+(1-a/amax)*(H-pad.t-pad.b);
+  let g='';
+  for(let a=0;a<=2500;a+=500)g+=`<line class="gl" x1="${pad.l}" x2="${Wd-pad.r}" y1="${y(a)}" y2="${y(a)}"/><text class="ax" x="${pad.l-6}" y="${y(a)+4}" text-anchor="end">${a}</text>`;
+  const step=(k1-k0)>100?20:10;for(let k=Math.ceil(k0/step)*step;k<=k1;k+=step)g+=`<text class="ax" x="${x(k)}" y="${H-6}" text-anchor="middle">${k}</text>`;
+  g+=`<text class="ax" x="${Wd-pad.r}" y="${H-6}" text-anchor="end">km</text>`;
+  const line=pts.map(p=>`${x(p.km).toFixed(1)},${y(p.alt).toFixed(1)}`).join(' L');
+  g+=`<path d="M${x(pts[0].km)},${y(0)} L${line} L${x(pts[pts.length-1].km)},${y(0)} Z" fill="var(--terrain)" fill-opacity=".18"/>`;
+  g+=`<path d="M${line}" fill="none" stroke="var(--terrain)" stroke-width="2" stroke-linejoin="round"/>`;
+  const sel=P[S.sel];
+  if(sel.km>=k0&&sel.km<=k1)g+=`<line x1="${x(sel.km)}" x2="${x(sel.km)}" y1="${pad.t-8}" y2="${y(0)}" stroke="var(--accent-ink)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  let lastX=-99;
+  pts.forEach(p=>{const cx=x(p.km),cy=y(p.alt);
+    if(p.kind==='pr')g+=`<circle cx="${cx}" cy="${cy}" r="2.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.2"/>`;
+    else g+=`<circle cx="${cx}" cy="${cy}" r="${p.kind==='bv'?6:4}" fill="${p.kind==='bv'?'var(--accent)':p.ptg==='B'?'var(--ink)':'var(--surface)'}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    const show=p.kind!=='pr'&&(cx-lastX>(Wd<500?34:30)||p.kind==='bv');
+    if(show){g+=`<text class="lbl" x="${cx}" y="${cy-10}" text-anchor="middle">${p.code}</text>`;lastX=cx}
+  });
+  pts.filter(p=>/[RE]/.test(p.svc)).forEach(p=>g+=`<path d="M${x(p.km)},${y(0)-13} q4,6 0,9 q-4,-3 0,-9 Z" fill="var(--water)"/>`);
+  if(sel.km>=k0&&sel.km<=k1)g+=`<circle cx="${x(sel.km)}" cy="${y(sel.alt)}" r="9" fill="none" stroke="var(--accent-ink)" stroke-width="2"/>`;
+  box.innerHTML=`<svg viewBox="0 0 ${Wd} ${H}" height="${H}" role="img" aria-label="Profil altimétrique">${g}</svg>`;
+  const svg=box.querySelector('svg');
+  const pick=ev=>{const r=svg.getBoundingClientRect();const k=k0+(ev.clientX-r.left-pad.l*r.width/Wd)/((Wd-pad.l-pad.r)*r.width/Wd)*(k1-k0);
+    let best=pts[0];pts.forEach(p=>{if(Math.abs(p.km-k)<Math.abs(best.km-k))best=p});if(best.i!==S.sel){S.sel=best.i;save();renderProfile();renderInfo()}};
+  svg.addEventListener('pointerdown',pick);svg.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||e.buttons)pick(e)});
+}
+function sectionLine(p){if(p.i===0)return'Ligne de départ';const pr=P[p.i-1];const g=p.part?((p.dp-p.dm)/p.part/10):0;
+  return`Depuis ${pr.code} : <b class="num">${nf(p.part)} km</b> · +${p.dp} / −${p.dm} m · pente nette ${nf(g)} %`}
+function renderInfo(){
+  const p=P[S.sel];const m=PL.margin[p.i];const nx=P.slice(p.i+1).find(q=>q.kind!=='pr');
+  $('#pinfo').innerHTML=`<div class="info-top"><h3 style="font-size:24px">${codeTag(p)}${esc(p.name)}</h3><span class="pill ${mClass(m)}">${p.close!=null?mText(m):'pas de barrière'}</span></div>
+  <div class="hint" style="font-size:14px">${sectionLine(p)}</div>
+  <div class="kv"><div><small>Km</small><b>${nf(p.km)}</b></div><div><small>Altitude</small><b>${p.alt} m</b></div><div><small>Cumul D+</small><b>${p.cdp} m</b></div>
+  <div><small>Ouverture</small><b>${fmt(p.open)}</b></div><div><small>Fermeture</small><b>${fmt(p.close)}</b></div><div><small>Ton passage</small><b>${fmt(PL.arr[p.i])}</b></div></div>
+  ${tagsHtml(p)}
+  ${p.off!==p.code?`<div class="hint">Code officiel du roadbook : ${p.off}</div>`:''}
+  ${p.ptg?`<div class="hint">${p.ptg==='B'?'Pointage avec barrière horaire éliminatoire':'Pointage indicatif, non éliminatoire'} · assistance personnelle ${p.svc.includes('A')?'autorisée':'non autorisée'}</div>`:''}
+  ${(w=>w?`<div><span class="wbadge">Prochaine eau : ${w.code} à ${nf(w.km-p.km)} km · +${w.cdp-p.cdp} m D+</span></div>`:'')(nextWater(p))}
+  ${nx?`<div class="hint">Prochain poste : ${nx.code} ${esc(nx.name)} à ${nf(nx.km-p.km)} km · +${nx.cdp-p.cdp} / −${nx.cdm-p.cdm} m</div>`:''}
+  <div style="display:flex;gap:6px"><button class="btn ghost" id="prev">← Précédent</button><button class="btn ghost" id="next">Suivant →</button></div>`;
+  $('#prev').onclick=()=>{S.sel=Math.max(0,S.sel-1);fitRange();save();renderProfile();renderInfo()};
+  $('#next').onclick=()=>{S.sel=Math.min(P.length-1,S.sel+1);fitRange();save();renderProfile();renderInfo()};
+}
+function fitRange(){const k=P[S.sel].km,[,a,b]=RANGES[S.range];if(k<a||k>b){S.range=0;$('#ranges').querySelectorAll('.chip').forEach((c,i)=>c.setAttribute('aria-pressed',i===0))}}
+const WATER=P.filter(p=>/[RE]/.test(p.svc));
+const nextWater=p=>WATER.find(w=>w.km>p.km);
+function renderWater(){
+  const segs=WATER.slice(1).map((b,k)=>{const a=WATER[k];return{a,b,km:b.km-a.km,dp:b.cdp-a.cdp,dm:b.cdm-a.cdm,t:PL.arr[b.i]-PL.arr[a.i]-PL.stops[a.i],
+    mid:P.filter(q=>q.km>a.km&&q.km<b.km&&q.kind!=='pr')}});
+  const maxKm=Math.max(...segs.map(s=>s.km));
+  $('#water').innerHTML=segs.map(s=>{const long=s.km>=13||s.t>=3.5;
+    const midTxt=s.mid.length?`Passe par ${s.mid.map(q=>q.code+(q.svc.includes('A')?' (assistance autorisée)':' (sans eau)')).join(', ')}`:'';
+    return`<div class="wseg ${long?'long':''}" data-i="${s.b.i}"><div class="wkm num">${nf(s.km)}<small> km</small></div>
+    <div class="n"><b>${s.a.code} → ${s.b.code}</b> ${s.b.svc.includes('R')?'':'<span class="wbadge">eau seule</span>'}
+    <span class="hint">+${s.dp} / −${s.dm} m${midTxt?' · '+midTxt:''}</span></div>
+    <span class="pill ${long?'p-bad':'p-na'}">${dur(s.t)}</span>
+    <div style="grid-column:1/-1;height:4px;border-radius:2px;background:var(--line)"><div style="height:4px;border-radius:2px;width:${s.km/maxKm*100}%;background:${long?'var(--bad)':'var(--water)'}"></div></div></div>`}).join('');
+  $('#water').onclick=e=>{const r=e.target.closest('[data-i]');if(!r)return;S.sel=+r.dataset.i;S.range=0;
+    $('#ranges').querySelectorAll('.chip').forEach((c,i)=>c.setAttribute('aria-pressed',i===0));save();renderProfile();renderInfo();$('#profile').scrollIntoView({behavior:'smooth',block:'center'})};
+}
+const LEGPTS=['DEP','R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11','R12','T-shirt finish','ARR'].map(c=>P.find(p=>p.code===c));
+const isFood=p=>/[REOH]/.test(p.svc);
+const isAssist=p=>p.svc.includes('A')&&!p.note;
+const lname=p=>p.code==='ARR'?'Arrivée':p.code==='DEP'?'Départ':p.code;
+function renderLegs(){
+  let html='';
+  for(let k=1;k<LEGPTS.length;k++){
+    const a=LEGPTS[k-1],b=LEGPTS[k];
+    const km=b.km-a.km,dp=b.cdp-a.cdp,dm=b.cdm-a.cdm;
+    // chaîne eau / repas : début du tronçon, points eau intermédiaires, fin du tronçon
+    const inner=P.filter(q=>q.km>a.km&&q.km<b.km&&isFood(q));
+    const chainPts=[a,...inner,b];
+    const lastFoodBefore=[...P].reverse().find(q=>q.km<a.km+0.001&&isFood(q));
+    let chain='';
+    chainPts.forEach((q,j)=>{
+      if(j>0){const d=q.km-chainPts[j-1].km;chain+=`<span class="ar ${d>=13?'long':''}">— ${nf(d)} km →</span>`}
+      const food=isFood(q),as=isAssist(q);
+      const lbl=q===a||q===b?lname(q):q.code;
+      chain+=`<span class="st">${lbl}</span>`+(food?(/[OH]/.test(q.svc)?`<span class="wbadge">${q.svc.includes('H')?'repas chaud':'soupe'}</span>`:`<span class="wbadge">${q.svc.includes('R')?'ravito':'eau'}</span>`):q.code==='DEP'?'':`<span class="tag" style="color:var(--bad)">pas d'eau</span>`)+(as&&(q===a||q===b)?'':'');
+    });
+    const fromFood=b.km-([...P].reverse().find(q=>q.km<b.km-0.001&&isFood(q))||P[0]).km;
+    const lastAs=[...P].reverse().find(q=>q.km<b.km-0.001&&isAssist(q))||P[0];
+    const asKm=b.km-lastAs.km;
+    const asTxt=isAssist(b)?`<span class="tag s">assistance à ${lname(b)}</span> ${nf(asKm)} km depuis ${lname(lastAs)}`:`<span class="tag" style="color:var(--bad)">pas d'assistance à ${lname(b)}</span> ${nf(asKm)} km depuis ${lname(lastAs)}`;
+    const t=PL.arr[b.i]-PL.arr[a.i]-PL.stops[a.i];
+    html+=`<div class="leg"><div class="leg-h" data-i="${b.i}"><h3>${lname(a)} → ${lname(b)}</h3><span class="hint">${esc(a.name)} → ${esc(b.name)} · ~${dur(t)} avec ton plan</span></div>
+    <div class="kv">
+      <div><small>Distance</small><b>${nf(km)} km</b></div>
+      <div><small>Cumul km</small><b>${nf(b.km)} km</b></div>
+      <div><small>D+ / D−</small><b>+${dp} / −${dm}</b></div>
+      <div><small>Cumul D+ / D−</small><b>+${b.cdp} / −${b.cdm}</b></div>
+    </div>
+    <div class="leg-l">Eau / repas</div>
+    <div class="chain">${chain}</div>
+    ${!isFood(b)?`<div class="hint">Pas d'eau à ${lname(b)} : ${nf(fromFood)} km depuis la dernière eau, et la prochaine est à ${nf((nextWater(b)||b).km-b.km)} km.</div>`:''}
+    <div class="leg-l">Assistance personnelle</div>
+    <div class="chain">${asTxt}</div>
+    </div>`;
+  }
+  const last=LEGPTS[LEGPTS.length-1];
+  const foodPts=P.filter(isFood),asPts=P.filter(isAssist);
+  const gaps=arr=>arr.slice(1).map((q,j)=>q.km-arr[j].km);
+  html+=`<div class="leg total"><div class="leg-h"><h3>Total parcours</h3></div><div class="kv">
+    <div><small>Distance</small><b>${nf(last.km)} km</b></div><div><small>D+ / D−</small><b>+${last.cdp} / −${last.cdm}</b></div>
+    <div><small>Points eau / repas</small><b>${foodPts.length} · max ${nf(Math.max(...gaps(foodPts)))} km</b></div>
+    <div><small>Points assistance</small><b>${asPts.length} · max ${nf(Math.max(...gaps(asPts)))} km</b></div></div></div>`;
+  $('#legs').innerHTML=html;
+  $('#legs').onclick=e=>{const r=e.target.closest('[data-i]');if(!r)return;S.sel=+r.dataset.i;S.range=0;
+    $('#ranges').querySelectorAll('.chip').forEach((c,i)=>c.setAttribute('aria-pressed',i===0));save();renderProfile();renderInfo();$('#profile').scrollIntoView({behavior:'smooth',block:'center'})};
+}
+const isW=p=>/[REOH]/.test(p.svc), isA=p=>p.svc.includes('A')&&!p.note;
+document.querySelectorAll('#segf .chip').forEach(b=>b.onclick=()=>{const k=b.dataset.s==='w'?'segW':'segA';S[k]=!S[k];if(!S.segW&&!S.segA)S[k==='segW'?'segA':'segW']=true;save();renderSegs()});
+function renderSegs(){
+  document.querySelectorAll('#segf .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s==='w'?S.segW:S.segA));
+  const stops=P.filter((p,i)=>i===0||i===P.length-1||(S.segW&&isW(p))||(S.segA&&isA(p)));
+  const segs=stops.slice(1).map((b,k)=>{const a=stops[k];return{a,b,km:b.km-a.km,dp:b.cdp-a.cdp,dm:b.cdm-a.cdm,t:PL.arr[b.i]-PL.arr[a.i]-PL.stops[a.i]}});
+  const maxKm=Math.max(...segs.map(s=>s.km));
+  const badges=p=>(isW(p)?'<span class="wbadge" title="Eau / repas">eau</span> ':'')+(isA(p)?'<span class="tag s" title="Assistance personnelle">assist.</span>':'');
+  $('#segt').innerHTML=`<thead><tr><th>Tronçon</th><th>Services à l'arrivée</th><th class="r">Distance</th><th class="r">Km cumulés</th><th class="r">D+</th><th class="r">D+ cumulé</th><th class="r">D−</th><th class="r">D− cumulé</th><th class="r">Temps plan</th></tr></thead><tbody>`+
+    segs.map(s=>`<tr class="click" data-i="${s.b.i}"><td><b>${s.a.code} → ${s.b.code}</b><br><span class="hint">${esc(s.b.name)}</span></td><td>${badges(s.b)}</td>
+    <td class="r num"><b>${nf(s.km)} km</b><div style="height:3px;border-radius:2px;background:var(--line);margin-top:3px"><div style="height:3px;border-radius:2px;width:${s.km/maxKm*100}%;background:var(--terrain)"></div></div></td>
+    <td class="r num">${nf(s.b.km)}</td><td class="r num">+${s.dp}</td><td class="r num">${s.b.cdp}</td><td class="r num">−${s.dm}</td><td class="r num">${s.b.cdm}</td><td class="r num">${dur(s.t)}</td></tr>`).join('')+
+    `</tbody><tfoot><tr><td><b>Total</b></td><td></td><td class="r num"><b>${nf(TOT)} km</b></td><td></td><td class="r num"><b>+${P.at(-1).cdp}</b></td><td></td><td class="r num"><b>−${P.at(-1).cdm}</b></td><td></td><td class="r num">${dur(S.target)}</td></tr></tfoot>`;
+  const L=segs.reduce((a,s)=>s.km>a.km?s:a),C=segs.reduce((a,s)=>s.dp>a.dp?s:a);
+  $('#segsum').innerHTML=`<div><small>Tronçons</small><b>${segs.length}</b></div><div><small>Distance moyenne</small><b>${nf(TOT/segs.length)} km</b></div>
+   <div class="warn"><small>Plus long</small><b>${L.a.code} → ${L.b.code} · ${nf(L.km)} km</b></div><div class="warn"><small>Plus de D+</small><b>${C.a.code} → ${C.b.code} · +${C.dp} m</b></div>`;
+  $('#segt').onclick=e=>{const r=e.target.closest('tr[data-i]');if(!r)return;S.sel=+r.dataset.i;S.range=0;
+    $('#ranges').querySelectorAll('.chip').forEach((c,i)=>c.setAttribute('aria-pressed',i===0));save();renderProfile();renderInfo();$('#profile').scrollIntoView({behavior:'smooth',block:'center'})};
+}
+function renderRanks(){
+  const seg=P.filter(p=>p.i>0&&p.part>0);
+  const li=(p,v,u,a)=>`<li data-i="${p.i}"><span class="code ${p.kind}">${p.code}</span><span class="n">${esc(p.name)}<br><span class="hint">${a} m en ${nf(p.part)} km</span></span><span class="num">${Math.round(v)} ${u}</span></li>`;
+  $('#climbs').innerHTML=seg.filter(p=>p.dp>=150).sort((a,b)=>b.dp/b.part-a.dp/a.part).slice(0,6).map(p=>li(p,p.dp/p.part,'m/km','+'+p.dp)).join('');
+  $('#descents').innerHTML=seg.filter(p=>p.dm>=150).sort((a,b)=>b.dm/b.part-a.dm/a.part).slice(0,6).map(p=>li(p,p.dm/p.part,'m/km','−'+p.dm)).join('');
+  document.querySelectorAll('ol.rank').forEach(o=>o.onclick=e=>{const l=e.target.closest('li');if(!l)return;S.sel=+l.dataset.i;S.range=0;
+    $('#ranges').querySelectorAll('.chip').forEach((c,i)=>c.setAttribute('aria-pressed',i===0));save();renderProfile();renderInfo();$('#profile').scrollIntoView({behavior:'smooth',block:'center'})});
+}
+
+// ---------- plan ----------
+const ctl=[['target','target'],['fatigue','fatigue'],['s-bv','bv'],['s-rv','rv'],['s-eau','eau']];
+ctl.forEach(([id,k])=>{const el=$('#'+id);el.value=S[k];el.oninput=()=>{const v=parseFloat(el.value);if(!isNaN(v)){S[k]=v;PL=plan();save();renderPlan()}}});
+const DOPT=['Jeu','Ven','Sam','Dim'];
+const toE=(d,t)=>{if(!t)return null;const[h,m]=t.split(':').map(Number);return d*24+h+m/60-22};
+const fromE=e=>{const tm=Math.round((e+22)*60);return{d:Math.min(3,Math.max(0,Math.floor(tm/1440))),t:`${String(Math.floor(tm%1440/60)).padStart(2,'0')}:${String(tm%60).padStart(2,'0')}`}};
+function tin(key,val,guess){const v=val!=null?fromE(val):null;const g=fromE(guess!=null?guess:0);const d=v?v.d:g.d;
+  return`<span class="tin ${v?'set':''}"><select data-k="${key}" aria-label="Jour">${DOPT.map((n,i)=>`<option value="${i}" ${i===d?'selected':''}>${n}</option>`).join('')}</select><input type="time" data-k="${key}" data-g="${guess!=null?guess:''}" aria-label="Heure" value="${v?v.t:''}"></span>`}
+function readTin(root,key,fromInput){const sel=root.querySelector(`select[data-k="${key}"]`),inp=root.querySelector(`input[data-k="${key}"]`);
+  if(fromInput&&inp.value&&!sel.closest('.tin').classList.contains('set')&&inp.dataset.g!==''){const g=+inp.dataset.g;let best=0;for(let d=1;d<4;d++)if(Math.abs(toE(d,inp.value)-g)<Math.abs(toE(best,inp.value)-g))best=d;sel.value=best}
+  return toE(+sel.value,inp.value)}
+function nowE(){const n=new Date();const d={4:0,5:1,6:2,0:3}[n.getDay()];if(d==null)return null;return d*24+n.getHours()+n.getMinutes()/60-22}
+const fatLabel=f=>f<0.1?'aucune':f<0.3?'légère':f<0.55?'modérée':'forte';
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;PL=plan();save();renderPlan()});
+$('#man-fill').onclick=()=>{P.forEach(p=>{if(p.i>0&&p.kind!=='pr'&&S.man[p.i]==null)S.man[p.i]=Math.round(PL.arr[p.i]*12)/12});PL=plan();save();renderPlan()};
+let clearArm=false;
+$('#man-clear').onclick=()=>{if(!clearArm){clearArm=true;$('#man-clear').textContent='Confirmer l\'effacement';setTimeout(()=>{clearArm=false;$('#man-clear').textContent='Effacer mes horaires'},4000);return}
+  clearArm=false;S.man={};$('#man-clear').textContent='Effacer mes horaires';PL=plan();save();renderPlan()};
+function renderPlan(){
+  const man=S.mode==='manual';const nMan=Object.values(S.man).filter(v=>v!=null).length;
+  document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.mode));
+  $('#mode-hint').textContent=man?`${nMan} horaire${nMan>1?'s':''} saisi${nMan>1?'s':''}. Les autres points sont complétés par le calcul.`:'Horaires calculés à partir du temps visé.';
+  $('#man-fill').hidden=!man;$('#man-clear').hidden=!man;
+  $('#target-ctrl').querySelector('label').firstChild.textContent=man?'Temps visé (sert à compléter les trous) ':'Temps visé ';
+  $('#o-target').textContent=man?`arrivée prévue ${fmt(PL.finish)} · ${dur(PL.finish)}`:`${dur(S.target)} · arrivée ${fmt(S.target)}`;
+  $('#o-fatigue').textContent=fatLabel(S.fatigue);
+  const bar=P.filter(p=>p.close!=null&&p.ptg==='B'&&p.i>0);
+  const tight=bar.reduce((a,p)=>PL.margin[p.i]<PL.margin[a.i]?p:a,bar[0]);
+  const nTight=bar.filter(p=>PL.margin[p.i]<1).length;const tm=PL.margin[tight.i];
+  const cls=m=>m<0.5?'bad':m<2?'warn':'ok';
+  $('#psum').innerHTML=`<div><small>Arrivée${man?' (mes horaires)':''}</small><b>${fmt(PL.finish)}</b></div>
+  <div><small>Temps de course</small><b>${dur(PL.finish)}</b></div><div><small>Arrêts prévus</small><b>${dur(PL.stopTot)}</b></div>
+  <div class="${cls(tm)}"><small>Barrière la plus serrée</small><b>${tight.code} · ${mText(tm)}</b></div>
+  <div class="${nTight?'bad':'ok'}"><small>Barrières à moins d'1h</small><b>${nTight}</b></div>`;
+  const early=P.filter(p=>p.open!=null&&PL.arr[p.i]<p.open&&p.i>0);
+  const bad=man?P.filter(p=>p.i>0&&PL.arr[p.i]<PL.arr[p.i-1]-1e-6):[];
+  $('#pwarn').innerHTML=(bad.length?`<div class="warnbox">Horaire avant celui du point précédent : ${bad.map(p=>p.code).join(', ')}. Vérifie le jour choisi.</div>`:'')+(PL.moving<=0?`<div class="warnbox">Les arrêts dépassent le temps visé. Réduis-les.</div>`:'')+
+   (early.length?`<div class="warnbox">Avec ce plan tu arrives avant l'ouverture de : ${early.map(p=>p.code).join(', ')}. Le modèle est trop rapide ou tu joues devant.</div>`:'')+
+   (tm<0?`<div class="warnbox" style="background:var(--bad-bg);color:var(--bad)">Plan hors délai à ${tight.code} ${esc(tight.name)}. Pars plus vite au début ou baisse la baisse de régime.</div>`:'');
+  renderCorridor();renderTable();
+}
+function renderCorridor(){
+  const box=$('#corridor');const Wd=Math.max(300,box.clientWidth),H=Wd<500?260:320;const pad={l:58,r:12,t:12,b:24};
+  const x=k=>pad.l+k/TOT*(Wd-pad.l-pad.r);const y=t=>pad.t+(1-t/68)*(H-pad.t-pad.b);
+  let g='';
+  for(let t=0;t<=66;t+=6)g+=`<line class="gl" x1="${pad.l}" x2="${Wd-pad.r}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${pad.l-6}" y="${y(t)+4}" text-anchor="end">${fmt(t)}</text>`;
+  for(let k=0;k<=180;k+=Wd<500?40:20)g+=`<text class="ax" x="${x(k)}" y="${H-6}" text-anchor="middle">${k}</text>`;
+  const cl=P.filter(p=>p.close!=null),op=P.filter(p=>p.open!=null);
+  g+=`<path d="M${cl.map(p=>`${x(p.km)},${y(p.close)}`).join(' L')} L${x(TOT)},${y(0)} L${x(0)},${y(0)} Z" fill="var(--ok)" fill-opacity=".06"/>`;
+  g+=`<polyline points="${op.map(p=>`${x(p.km)},${y(p.open)}`).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  g+=`<polyline points="${cl.map(p=>`${x(p.km)},${y(p.close)}`).join(' ')}" fill="none" stroke="var(--bad)" stroke-width="2"/>`;
+  g+=`<polyline points="${P.map(p=>`${x(p.km)},${y(PL.arr[p.i])}`).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>`;
+  const act=P.filter(p=>p.i===0||(S.log[p.i]&&(S.log[p.i].a!=null||S.log[p.i].d!=null))).map(p=>[p,p.i===0?0:(S.log[p.i].a??S.log[p.i].d)]);
+  if(act.length>1)g+=`<polyline points="${act.map(([p,t])=>`${x(p.km)},${y(t)}`).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2"/>`+act.slice(1).map(([p,t])=>`<circle cx="${x(p.km)}" cy="${y(t)}" r="3" fill="var(--ink)"/>`).join('');
+  cl.forEach(p=>{const m=PL.margin[p.i];const c=m<0.5?'var(--bad)':m<2?'var(--warn)':'var(--ok)';
+    g+=`<circle cx="${x(p.km)}" cy="${y(PL.arr[p.i])}" r="${p.kind==='bv'?5:3.5}" fill="${c}" stroke="var(--surface)" stroke-width="1.5"><title>${p.code} ${p.name} : ${fmt(PL.arr[p.i])} (${mText(m)})</title></circle>`});
+  g+=`<text class="lbl" x="${x(80.6)}" y="${y(PL.arr[9])+16}" text-anchor="middle">R5</text><text class="lbl" x="${x(140.5)}" y="${y(PL.arr[24])+16}" text-anchor="middle">R10</text>`;
+  box.innerHTML=`<svg viewBox="0 0 ${Wd} ${H}" height="${H}" role="img" aria-label="Plan comparé aux barrières horaires">${g}</svg>`;
+}
+function renderTable(){
+  const rows=P.filter(p=>S.showPR||p.kind!=='pr');
+  const man=S.mode==='manual';
+  $('#ptable').innerHTML=`<thead><tr><th>Point</th><th class="r">Km</th><th>${man?'Mon horaire prévu':'Passage'}</th><th>Fermeture</th><th>Marge</th><th class="r">Arrêt</th></tr></thead><tbody>`+
+  rows.map(p=>{const m=PL.margin[p.i];const has=S.man[p.i]!=null;
+    const cell=man&&p.i>0?`${tin('m'+p.i,has?S.man[p.i]:null,PL.arr[p.i])}${has?` <button class="xbtn" data-x="${p.i}" aria-label="Effacer">×</button>`:`<span class="est">calculé : ${fmt(PL.arr[p.i])}</span>`}`:fmt(PL.arr[p.i]);
+    return`<tr class="${man?'':'click'} ${p.kind==='pr'?'pr':''}" data-i="${p.i}"><td>${codeTag(p)}<span>${esc(p.name)}</span></td><td class="r num">${nf(p.km)}</td><td class="num">${cell}</td><td class="num">${fmt(p.close)}</td><td>${p.close!=null?`<span class="pill ${mClass(m)}">${dur(m)}</span>`:''}</td><td class="r num">${PL.stops[p.i]?Math.round(PL.stops[p.i]*60)+' min':''}</td></tr>`}).join('')+'</tbody>';
+  const T=$('#ptable');
+  T.onchange=e=>{const k=e.target.dataset.k;if(!k)return;const i=+k.slice(1);const v=readTin(T,k,e.target.tagName==='INPUT');if(v==null){if(e.target.tagName==='SELECT')return;delete S.man[i]}else S.man[i]=v;PL=plan();save();renderPlan()};
+  T.onclick=e=>{const x=e.target.closest('[data-x]');if(x){delete S.man[+x.dataset.x];PL=plan();save();renderPlan();return}
+    if(man)return;const r=e.target.closest('tr[data-i]');if(!r)return;S.sel=+r.dataset.i;fitRange();setTab('profil')};
+}
+$('#pr-toggle').setAttribute('aria-pressed',S.showPR);
+$('#pr-toggle').onclick=()=>{S.showPR=!S.showPR;$('#pr-toggle').setAttribute('aria-pressed',S.showPR);save();renderTable()};
+$('#copy-assist').onclick=()=>{
+  const txt=`Diagonale des Fous 2026 · plan ${dur(PL.finish)} (arrivée ${fmt(PL.finish)})\nPoints d'assistance :\n`+
+    P.filter(p=>p.svc.includes('A')&&!p.note).map(p=>`${p.code} ${p.name} (km ${nf(p.km)}) : ~${fmt(PL.arr[p.i])}${p.close!=null?` · fermeture ${fmt(p.close)}`:''}${p.svc.includes('S')?' · sac de rechange':''}`).join('\n');
+  const fb=()=>{const t=$('#copy-fallback');t.value=txt;t.hidden=false;t.select();$('#copy-msg').textContent='Copie automatique indisponible : sélectionne le texte ci-dessous.'};
+  try{navigator.clipboard.writeText(txt).then(()=>{$('#copy-msg').textContent='Horaires copiés. Colle-les dans le groupe de ton assistance.'},fb)}catch(e){fb()}
+};
+
+// ---------- live ----------
+const LG=i=>S.log[i]||{};
+const setLog=(i,k,v)=>{const o={...LG(i)};if(v==null)delete o[k];else o[k]=v;if(o.a==null&&o.d==null)delete S.log[i];else S.log[i]=o};
+$('#l-pr').onclick=()=>{S.lpr=!S.lpr;save();renderLive()};
+let lclr=false;
+$('#l-clear').onclick=()=>{if(!lclr){lclr=true;$('#l-clear').textContent='Confirmer l\'effacement';setTimeout(()=>{lclr=false;$('#l-clear').textContent='Effacer les pointages'},4000);return}
+  lclr=false;S.log={};$('#l-clear').textContent='Effacer les pointages';save();renderLive()};
+function liveState(){
+  const done=P.filter(p=>p.i>0&&(LG(p.i).a!=null||LG(p.i).d!=null));
+  if(!done.length)return null;
+  const last=done[done.length-1];const L=LG(last.i);
+  const arrA=L.a!=null?L.a:L.d-PL.stops[last.i];
+  const ref=L.d!=null?L.d:L.a;const planRef=PL.arr[last.i]+(L.d!=null?PL.stops[last.i]:0);
+  const ratio=PL.arr[last.i]>0?arrA/PL.arr[last.i]:1;
+  const proj=j=>ref+(PL.arr[j]-planRef)*ratio;
+  return{last,L,ref,ratio,proj,arrA,done};
+}
+function renderLive(){
+  $('#l-pr').setAttribute('aria-pressed',S.lpr);
+  const st=liveState();
+  if(!st){$('#lres').innerHTML=`<div class="big"><b class="num">${fmt(PL.finish)}</b><span>arrivée prévue au plan · aucun pointage saisi</span></div><p class="hint" style="margin:0">Saisis la première arrivée dans le tableau Pointages (par exemple R1 Domaine Vidot) pour lancer la projection.</p>`}
+  else{
+    const{last:p,L,ref,ratio,proj,arrA}=st;
+    const fin=proj(P.length-1);const ck=L.d!=null?L.d:L.a;const mHere=p.close!=null?p.close-ck:null;
+    const nexts=P.filter(q=>q.i>p.i&&q.close!=null&&q.ptg==='B');
+    let bind=null,bindTol=Infinity;
+    const rowsH=nexts.map(q=>{const t=proj(q.i),m=q.close-t;const span=PL.arr[q.i]-(PL.arr[p.i]+(L.d!=null?PL.stops[p.i]:0));
+      const tol=span>0?((q.close-ref)/span)/ratio-1:Infinity;if(tol<bindTol){bindTol=tol;bind=q}
+      return`<tr><td>${codeTag(q)}${esc(q.name)}</td><td class="num">${fmt(t)}</td><td class="num">${fmt(q.close)}</td><td><span class="pill ${mClass(m)}">${dur(m)}</span></td></tr>`}).join('');
+    const out=fin>66||(mHere!=null&&mHere<0);const vc=out?'p-bad':bindTol<0.1?'p-warn':'p-ok';
+    const ec=arrA-PL.arr[p.i];
+    const speed=ratio>1?`${Math.round((ratio-1)*100)} % plus lent que le plan`:`${Math.round((1-ratio)*100)} % plus rapide que le plan`;
+    const stopR=L.a!=null&&L.d!=null?L.d-L.a:null;
+    $('#lres').innerHTML=`
+    <div class="big"><b class="num">${fmt(fin)}</b><span>arrivée projetée · ${dur(fin)} de course</span></div>
+    ${(w=>w?`<div><span class="wbadge">Prochaine eau : ${w.code} à ${nf(w.km-p.km)} km · ~${fmt(proj(w.i))}</span></div>`:'')(nextWater(p))}
+    <div class="sum"><div><small>Dernier pointage</small><b>${p.code} · ${L.d!=null?'parti':'arrivé'} ${fmt(ck)}</b></div>
+    <div class="${ec>0.25?'warn':'ok'}"><small>Écart au plan à ${p.code}</small><b>${ec>=0?'+':''}${dur(ec)}</b></div>
+    ${stopR!=null?`<div class="${stopR>PL.stops[p.i]+0.25?'warn':'ok'}"><small>Arrêt à ${p.code}</small><b>${dur(stopR)} (prévu ${Math.round(PL.stops[p.i]*60)} min)</b></div>`:''}
+    <div class="${ratio>1.05?'warn':'ok'}"><small>Allure depuis le départ</small><b>${speed}</b></div>
+    ${mHere!=null?`<div class="${mHere<0.5?'bad':mHere<2?'warn':'ok'}"><small>Marge sur ${p.code}</small><b>${mText(mHere)}</b></div>`:''}</div>
+    <div class="verdict ${vc}">${mHere!=null&&mHere<0?`Pointage après la fermeture de ${p.code}.`:fin>66?`À cette allure, l'arrivée dépasse la barrière finale de ${dur(fin-66)}. Il faut accélérer d'environ ${Math.round(-bindTol*100)} %.`:
+      bind?(bindTol>=0?`Il peut encore ralentir d'environ ${Math.round(bindTol*100)} % avant de buter sur ${bind.code} ${esc(bind.name)}.`:`Il faut accélérer d'environ ${Math.round(-bindTol*100)} % pour passer ${bind.code} ${esc(bind.name)}.`):'Dernière ligne droite, plus de barrière devant.'}</div>
+    ${rowsH?`<div class="tbl"><table><thead><tr><th>Prochaines barrières</th><th>Passage projeté</th><th>Fermeture</th><th>Marge</th></tr></thead><tbody>${rowsH}</tbody></table></div>`:''}
+    <p class="hint" style="margin:0">Projection : le plan ${S.mode==='manual'?'(mes horaires)':'(calcul auto)'} recalé à l'allure réelle du coureur depuis le départ.</p>`;
+  }
+  const rows=P.filter(p=>p.i>0&&(S.lpr||p.kind!=='pr'||S.log[p.i]));
+  const nextI=st?st.last.i:0;
+  $('#ltable').innerHTML=rows.map(p=>{const L=LG(p.i);const gA=L.a??(st&&p.i>st.last.i?st.proj(p.i):PL.arr[p.i]);const gD=L.d??(L.a!=null?L.a+PL.stops[p.i]:gA+PL.stops[p.i]);
+      const stp=L.a!=null&&L.d!=null?L.d-L.a:null;const ref=L.a??(L.d!=null?L.d-PL.stops[p.i]:null);const ec=ref!=null?ref-PL.arr[p.i]:null;
+      const ck=L.d??L.a;const m=p.close!=null&&ck!=null?p.close-ck:null;
+      const cell=k=>`<div>${tin(k+p.i,L[k],k==='a'?gA:gD)}${L[k]!=null?`<button class="xbtn" data-lx="${k}${p.i}" aria-label="Effacer">×</button>`:`<button class="nowbtn" data-now="${k}${p.i}">Maintenant</button>`}</div>`;
+      return`<div class="lrow ${p.i===nextI?'cur':''}"><div class="hd"><span>${codeTag(p)}<b>${esc(p.name)}</b></span>${m!=null?`<span class="pill ${mClass(m)}">${mText(m)}</span>`:''}</div>
+      <div class="st"><span>km <b>${nf(p.km)}</b></span><span>prévu <b>${fmt(PL.arr[p.i])}</b></span>${p.close!=null?`<span>ferme <b>${fmt(p.close)}</b></span>`:''}
+      ${stp!=null?`<span>arrêt <b>${dur(stp)}</b></span>`:''}${ec!=null?`<span>écart <b style="color:${ec>0.25?'var(--warn)':ec<-0.25?'var(--ok)':'var(--ink)'}">${ec>=0?'+':''}${dur(ec)}</b></span>`:''}</div>
+      <div class="io"><span>Arrivée</span>${cell('a')}<span>Départ</span>${cell('d')}</div></div>`}).join('');
+  const T=$('#ltable');
+  T.onchange=e=>{const k=e.target.dataset.k;if(!k)return;const v=readTin(T,k,e.target.tagName==='INPUT');if(v==null&&e.target.tagName==='SELECT')return;setLog(+k.slice(1),k[0],v);save();renderLive()};
+  T.onclick=e=>{const n=e.target.closest('[data-now]');const x=e.target.closest('[data-lx]');
+    if(n){const k=n.dataset.now;const v=nowE();if(v==null||v<0){$('#l-confirm').innerHTML='<div class="warnbox">L\'heure du téléphone est hors de la course (jeudi 22h00 → dimanche). Saisis l\'heure à la main.</div>';return}
+      $('#l-confirm').innerHTML='';setLog(+k.slice(1),k[0],Math.round(v*60)/60);save();renderLive()}
+    if(x){const k=x.dataset.lx;setLog(+k.slice(1),k[0],null);save();renderLive()}};
+}
+
+// ---------- points ----------
+const FILT=[['B','Barrière éliminatoire'],['A','Assistance'],['S','Sac de rechange'],['R','Ravito'],['O','Soupe'],['H','Repas chaud'],['M','Médecin'],['KG','Kiné / podo'],['nopr','Masquer les PR']];
+$('#filters').innerHTML=FILT.map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${S.filters.includes(k)}">${l}</button>`).join('');
+$('#filters').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const k=b.dataset.f;S.filters=S.filters.includes(k)?S.filters.filter(x=>x!==k):[...S.filters,k];b.setAttribute('aria-pressed',S.filters.includes(k));save();renderPoints()};
+$('#q').oninput=renderPoints;
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+function renderPoints(){
+  const q=norm($('#q').value||'');
+  const list=P.filter(p=>(!q||norm(p.name+' '+p.code+' '+p.off).includes(q))&&S.filters.every(f=>f==='nopr'?p.kind!=='pr':f==='B'?p.ptg==='B':f==='KG'?/[KG]/.test(p.svc):p.svc.includes(f)));
+  $('#plist').innerHTML=list.length?list.map(p=>{const m=PL.margin[p.i];return`<details class="pt ${p.kind==='pr'?'is-pr':''}">
+    <summary><span class="nm">${codeTag(p)}${esc(p.name)}</span>${p.close!=null?`<span class="pill ${mClass(m)}">${dur(m)}</span>`:'<span></span>'}
+    <span class="sub"><span class="num">km ${nf(p.km)}</span><span class="num">${p.alt} m</span>${p.close!=null?`<span>ferme ${fmt(p.close)}</span>`:''}<span>passage ${fmt(PL.arr[p.i])}</span></span></summary>
+    <div class="body"><div class="hint">${sectionLine(p)}</div>
+    <div class="kv"><div><small>Ouverture</small><b>${fmt(p.open)}</b></div><div><small>Fermeture</small><b>${fmt(p.close)}</b></div><div><small>Cumul D+</small><b>${p.cdp} m</b></div><div><small>Cumul D−</small><b>${p.cdm} m</b></div></div>
+    ${tagsHtml(p)}<div><button class="btn ghost" data-go="${p.i}">Voir sur le profil</button></div></div></details>`}).join(''):'<p class="hint">Aucun point ne correspond. Retire un filtre.</p>';
+  $('#plist').onclick=e=>{const b=e.target.closest('[data-go]');if(!b)return;S.sel=+b.dataset.go;fitRange();setTab('profil');window.scrollTo({top:0})};
+}
+
+function renderAll(){
+  if(S.tab==='profil'){renderProfile();renderInfo();renderLegs();renderWater();renderSegs();renderRanks()}
+  if(S.tab==='plan')renderPlan();
+  if(S.tab==='live')renderLive();
+  if(S.tab==='points')renderPoints();
+}
+let rt;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(()=>{if(S.tab==='profil')renderProfile();if(S.tab==='plan')renderCorridor()},80)}).observe(document.querySelector('.wrap'));
+setTab(S.tab);
+</script>
+<script>
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+</script>
+</html>
